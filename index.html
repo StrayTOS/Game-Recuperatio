@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Recuperatio</title>
+    <link rel="icon" type="image/x-icon" href="./images/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="game-container">
+        <div id="loading-screen">
+            <div class="spinner"></div>
+            <div id="loading-text">Loading... 0%</div>
+        </div>
+        <div id="virtual-gamepad">
+            <!-- use for virtual gamepad -->
+        </div>
+        <div id="ui-layer">
+            <!-- UI elements will be injected here -->
+        </div>
+    </div>
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>
