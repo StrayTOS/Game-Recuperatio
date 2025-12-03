@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { textureManager } from '../GameEngine/TextureManager.js';
 
 export class ItemManager {
     constructor(scene) {
@@ -7,25 +8,22 @@ export class ItemManager {
     }
 
     spawnItem(position, type, velocity) {
-        const loader = new THREE.TextureLoader();
         const texturePath = type === 'health' ? 'TextureImage/item_health.png' : 'TextureImage/item_magic.png';
+        const texture = textureManager.getTexture(texturePath);
 
-        loader.load(texturePath, (texture) => {
-            texture.colorSpace = THREE.SRGBColorSpace;
-            texture.magFilter = THREE.NearestFilter;
-            texture.minFilter = THREE.NearestFilter;
+        if (texture) {
             const geometry = new THREE.PlaneGeometry(0.75, 0.75);
             const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
             const mesh = new THREE.Mesh(geometry, material);
             this.setupItemMesh(mesh, position, type, velocity);
-        }, undefined, () => {
+        } else {
             // Fallback
             const geometry = new THREE.PlaneGeometry(0.75, 0.75);
             const color = type === 'health' ? 0xff0000 : 0x0000ff;
             const material = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide });
             const mesh = new THREE.Mesh(geometry, material);
             this.setupItemMesh(mesh, position, type, velocity);
-        });
+        }
     }
 
     setupItemMesh(mesh, position, type, velocity) {

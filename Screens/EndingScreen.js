@@ -1,17 +1,15 @@
 import * as THREE from 'three';
 import { BaseScene } from '../GameEngine/BaseScene.js';
 import { audioManager } from '../GameEngine/AudioManager.js';
+import { textureManager } from '../GameEngine/TextureManager.js';
 
 export class EndingScreen extends BaseScene {
     setup() {
         audioManager.playBGM('Ending');
 
         // Witch smiling background
-        const loader = new THREE.TextureLoader();
-        loader.load('TextureImage/ending_bg.png', (texture) => {
-            texture.colorSpace = THREE.SRGBColorSpace;
-            texture.magFilter = THREE.NearestFilter;
-            texture.minFilter = THREE.NearestFilter;
+        const texture = textureManager.getTexture('TextureImage/ending_bg.png');
+        if (texture) {
             const geometry = new THREE.PlaneGeometry(16, 16);
             const material = new THREE.MeshBasicMaterial({ map: texture });
             const bg = new THREE.Mesh(geometry, material);
@@ -21,9 +19,9 @@ export class EndingScreen extends BaseScene {
 
             // Start Background Animation
             this.startBackgroundAnimation(bg, { x: -6.8, y: -7.8 - 3.85 }, { x: 0, y: -2.0 }, 2, 1.02, 7);
-        }, undefined, () => {
+        } else {
             this.scene.background = new THREE.Color(0xCCCCFF);
-        });
+        }
 
         this.createUI();
     }

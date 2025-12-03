@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { BaseScene } from '../GameEngine/BaseScene.js';
 import { audioManager } from '../GameEngine/AudioManager.js';
+import { textureManager } from '../GameEngine/TextureManager.js';
 
 export class TitleScreen extends BaseScene {
     setup() {
@@ -8,40 +9,31 @@ export class TitleScreen extends BaseScene {
         audioManager.playBGM('Title');
 
         // Layer 1: Background
-        const loader = new THREE.TextureLoader();
-        loader.load('TextureImage/background_forest.png',
-            (texture) => {
-                texture.colorSpace = THREE.SRGBColorSpace;
-                texture.magFilter = THREE.NearestFilter;
-                texture.minFilter = THREE.NearestFilter;
-                const geometry = new THREE.PlaneGeometry(16, 16);
-                const material = new THREE.MeshBasicMaterial({ map: texture });
-                const bg = new THREE.Mesh(geometry, material);
-                bg.position.z = -1;
-                this.scene.add(bg);
+        const bgTexture = textureManager.getTexture('TextureImage/background_forest.png');
+        if (bgTexture) {
+            const geometry = new THREE.PlaneGeometry(16, 16);
+            const material = new THREE.MeshBasicMaterial({ map: bgTexture });
+            const bg = new THREE.Mesh(geometry, material);
+            bg.position.z = -1;
+            this.scene.add(bg);
 
-                // Start Background Animation
-                this.startBackgroundAnimation(bg, { x: 0, y: -7.8 - 3.8 }, { x: 0, y: 0 }, 2, 1.01, 4);
-            },
-            undefined,
-            (err) => {
-                console.log('Background image not found, using fallback color.');
-                this.scene.background = new THREE.Color(0x224422);
-            }
-        );
+            // Start Background Animation
+            this.startBackgroundAnimation(bg, { x: 0, y: -7.8 - 3.8 }, { x: 0, y: 0 }, 2, 1.01, 4);
+        } else {
+            console.log('Background image not found, using fallback color.');
+            this.scene.background = new THREE.Color(0x224422);
+        }
 
         // Layer 2: Title Logo
-        loader.load('TextureImage/title_logo_only.png', (texture) => {
-            texture.colorSpace = THREE.SRGBColorSpace;
-            texture.magFilter = THREE.NearestFilter;
-            texture.minFilter = THREE.NearestFilter;
+        const logoTexture = textureManager.getTexture('TextureImage/title_logo_only.png');
+        if (logoTexture) {
             const geometry = new THREE.PlaneGeometry(8, 8);
-            const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+            const material = new THREE.MeshBasicMaterial({ map: logoTexture, transparent: true });
             const logo = new THREE.Mesh(geometry, material);
             logo.position.y = 1;
             logo.position.z = 0;
             this.scene.add(logo);
-        });
+        }
 
         // UI Elements
         this.createUI();
@@ -87,12 +79,30 @@ export class TitleScreen extends BaseScene {
         copyright.style.fontSize = '28px';
         container.appendChild(copyright);
 
+        // Notice Group
+        const noticeGroup = document.createElement('div');
+        noticeGroup.style.display = 'flex';
+        noticeGroup.style.justifyContent = 'space-between';
+        noticeGroup.style.marginTop = '100px';
+        container.appendChild(noticeGroup);
+
+        // Version
+        const version = document.createElement('div');
+        version.textContent = 'Version 0.2.0';
+        version.style.marginLeft = '32px';
+        version.style.textAlign = 'left';
+        version.style.fontSize = '24px';
+        version.style.opacity = '0.7';
+        noticeGroup.appendChild(version);
+
+        // AI Notice
         const aiNotice = document.createElement('div');
-        aiNotice.textContent = 'Created using Google Antigravity';
-        aiNotice.style.marginTop = '10px';
+        aiNotice.textContent = "Created using Google Antigravity's Gemini 3 Pro (High).";
+        aiNotice.style.marginRight = '32px';
+        aiNotice.style.textAlign = 'right';
         aiNotice.style.fontSize = '24px';
         aiNotice.style.opacity = '0.7';
-        container.appendChild(aiNotice);
+        noticeGroup.appendChild(aiNotice);
 
         this.uiContainer.appendChild(container);
 

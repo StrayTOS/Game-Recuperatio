@@ -10,6 +10,7 @@ import { GameOverScreen } from './Screens/GameOverScreen.js';
 import { EpilogueScreen } from './Screens/EpilogueScreen.js';
 import { EndingScreen } from './Screens/EndingScreen.js';
 import { audioManager } from './GameEngine/AudioManager.js';
+import { textureManager } from './GameEngine/TextureManager.js';
 
 class Game {
     constructor() {
@@ -44,10 +45,48 @@ class Game {
         const loadingText = document.getElementById('loading-text');
         const loadingScreen = document.getElementById('loading-screen');
 
-        await audioManager.loadSFX((progress) => {
-            const percent = Math.round(progress * 100);
+        // Define all textures to preload
+        const texturesToLoad = [
+            'TextureImage/background_forest.png',
+            'TextureImage/title_logo_only.png',
+            'TextureImage/prologue_window.png',
+            'TextureImage/stage1_atlas.png',
+            'TextureImage/objective_bg.png',
+            'TextureImage/player_wizard.png',
+            'TextureImage/enemy_ghost.png',
+            'TextureImage/enemy_skeleton.png',
+            'TextureImage/enemy_dragon.png',
+            'TextureImage/enemy_boss.png',
+            'TextureImage/item_box.png',
+            'TextureImage/item_health.png',
+            'TextureImage/item_magic.png',
+            'TextureImage/icon_hat.png',
+            'TextureImage/epilogue_diary.png',
+            'TextureImage/gameover_bg.png',
+            'TextureImage/ending_bg.png'
+        ];
+
+        // Combined loading progress
+        let audioProgress = 0;
+        let textureProgress = 0;
+
+        const updateProgress = () => {
+            const total = (audioProgress * 0.2) + (textureProgress * 0.8);
+            const percent = Math.round(total * 100);
             if (loadingText) loadingText.innerText = `Loading... ${percent}%`;
+        };
+
+        const audioPromise = audioManager.loadSFX((p) => {
+            audioProgress = p;
+            updateProgress();
         });
+
+        const texturePromise = textureManager.loadTextures(texturesToLoad, (p) => {
+            textureProgress = p;
+            updateProgress();
+        });
+
+        await Promise.all([audioPromise, texturePromise]);
 
         // Small delay to ensure 100% is seen
         await new Promise(r => setTimeout(r, 200));

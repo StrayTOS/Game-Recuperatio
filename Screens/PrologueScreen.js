@@ -1,17 +1,15 @@
 import * as THREE from 'three';
 import { BaseScene } from '../GameEngine/BaseScene.js';
 import { audioManager } from '../GameEngine/AudioManager.js';
+import { textureManager } from '../GameEngine/TextureManager.js';
 
 export class PrologueScreen extends BaseScene {
     setup() {
         audioManager.playBGM('Prologue');
 
         // Background (Vine design window)
-        const loader = new THREE.TextureLoader();
-        loader.load('TextureImage/prologue_window.png', (texture) => {
-            texture.colorSpace = THREE.SRGBColorSpace;
-            texture.magFilter = THREE.NearestFilter;
-            texture.minFilter = THREE.NearestFilter;
+        const texture = textureManager.getTexture('TextureImage/prologue_window.png');
+        if (texture) {
             const geometry = new THREE.PlaneGeometry(16, 16);
             const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
             const bg = new THREE.Mesh(geometry, material);
@@ -23,9 +21,9 @@ export class PrologueScreen extends BaseScene {
 
             // Start Background Animation
             this.startBackgroundAnimation(bg, { x: 0, y: 8 - 3.8 }, { x: 0, y: -2 }, 1.02, 1.02, 22.5);
-        }, undefined, () => {
+        } else {
             this.scene.background = new THREE.Color(0x112211);
-        });
+        }
 
         this.createUI();
     }
@@ -35,13 +33,8 @@ export class PrologueScreen extends BaseScene {
         this.sub_bg = new THREE.Group();
         parent.add(this.sub_bg);
 
-        const loader = new THREE.TextureLoader();
-        loader.load('TextureImage/stage1_atlas.png', (texture) => {
-            // Fix texture bleeding
-            texture.magFilter = THREE.NearestFilter;
-            texture.minFilter = THREE.NearestFilter;
-            texture.colorSpace = THREE.SRGBColorSpace;
-
+        const texture = textureManager.getTexture('TextureImage/stage1_atlas.png');
+        if (texture) {
             const meshWidth = 9;
             const meshHeight = 9;
             const geometry = new THREE.PlaneGeometry(meshWidth, meshHeight);
@@ -94,7 +87,7 @@ export class PrologueScreen extends BaseScene {
             // Coordinates are specified behind the background to create a sense of depth.
             this.sub_bg.position.z = -3.5;
             this.sub_bg.scale.set(2.0, 2.0, 1);
-        });
+        }
     }
 
     createUI() {

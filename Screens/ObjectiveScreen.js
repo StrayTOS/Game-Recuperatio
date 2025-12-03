@@ -1,17 +1,15 @@
 import * as THREE from 'three';
 import { BaseScene } from '../GameEngine/BaseScene.js';
 import { audioManager } from '../GameEngine/AudioManager.js';
+import { textureManager } from '../GameEngine/TextureManager.js';
 
 export class ObjectiveScreen extends BaseScene {
     setup() {
         audioManager.playBGM('Objective');
 
         // Half-screen window with magical character
-        const loader = new THREE.TextureLoader();
-        loader.load('TextureImage/objective_bg.png', (texture) => {
-            texture.colorSpace = THREE.SRGBColorSpace;
-            texture.magFilter = THREE.NearestFilter;
-            texture.minFilter = THREE.NearestFilter;
+        const texture = textureManager.getTexture('TextureImage/objective_bg.png');
+        if (texture) {
             const geometry = new THREE.PlaneGeometry(16, 16);
             const material = new THREE.MeshBasicMaterial({ map: texture });
             const bg = new THREE.Mesh(geometry, material);
@@ -20,9 +18,9 @@ export class ObjectiveScreen extends BaseScene {
 
             // Start Background Animation
             this.startBackgroundAnimation(bg, { x: 6.8, y: -8 - 3.8 }, { x: 0, y: 0 }, 2, 1.02, 6.0);
-        }, undefined, () => {
+        } else {
             this.scene.background = new THREE.Color(0x221133);
-        });
+        }
 
         this.createUI();
     }

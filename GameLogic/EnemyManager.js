@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { BulletManager } from './BulletManager.js';
 import { audioManager } from '../GameEngine/AudioManager.js';
+import { textureManager } from '../GameEngine/TextureManager.js';
 
 export class EnemyManager {
     constructor(scene, bulletManager, player) {
@@ -92,7 +93,6 @@ class Enemy {
         const varFac = Math.random() * 0.15;
 
         // Visuals
-        const loader = new THREE.TextureLoader();
         let texturePath = 'TextureImage/enemy_ghost.png';
         let width = 1.2 + varFac;
         let height = 1.2 + varFac;
@@ -115,12 +115,10 @@ class Enemy {
             height = 1;
         }
 
-        loader.load(texturePath, (texture) => {
-            texture.colorSpace = THREE.SRGBColorSpace;
-            texture.magFilter = THREE.NearestFilter;
-            texture.minFilter = THREE.NearestFilter;
+        const texture = textureManager.getTexture(texturePath);
+        if (texture) {
             this.createEnemyMesh(texture, width, height, null);
-        }, undefined, () => {
+        } else {
             // Fallback
             let color = 0xffffff;
             if (this.type === 'ghost') color = 0xaaaaaa;
@@ -130,7 +128,7 @@ class Enemy {
             else if (this.type === 'itembox') color = 0x808080;
 
             this.createEnemyMesh(null, width, height, color);
-        });
+        }
 
         // TODO : hardFac is a multiplier value that will be used as a parameter to change
         //  the difficulty in the optional game mode settings that will be developed later.

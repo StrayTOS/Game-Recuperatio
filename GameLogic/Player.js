@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { audioManager } from '../GameEngine/AudioManager.js';
 import { ChargeEffect } from './ChargeEffect.js';
+import { textureManager } from '../GameEngine/TextureManager.js';
 
 export class Player {
     GRAVITY_FACTOR = 0.35;
@@ -31,17 +32,14 @@ export class Player {
     }
 
     setupMesh() {
-        const loader = new THREE.TextureLoader();
-        loader.load('TextureImage/player_wizard.png', (texture) => {
-            texture.colorSpace = THREE.SRGBColorSpace;
-            texture.magFilter = THREE.NearestFilter;
-            texture.minFilter = THREE.NearestFilter;
+        const texture = textureManager.getTexture('TextureImage/player_wizard.png');
+        if (texture) {
             const geometry = new THREE.PlaneGeometry(1.5, 1.5);
             const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
             this.mesh = new THREE.Mesh(geometry, material);
             this.mesh.position.set(this.spawnPosition.x, this.spawnPosition.y, this.spawnPosition.z); // Start off-screen left
             this.scene.add(this.mesh);
-        });
+        }
     }
 
     update(deltaTime) {

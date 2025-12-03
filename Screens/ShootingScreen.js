@@ -5,6 +5,7 @@ import { EnemyManager } from '../GameLogic/EnemyManager.js';
 import { BulletManager } from '../GameLogic/BulletManager.js';
 import { ItemManager } from '../GameLogic/ItemManager.js';
 import { audioManager } from '../GameEngine/AudioManager.js';
+import { textureManager } from '../GameEngine/TextureManager.js';
 
 export class ShootingScreen extends BaseScene {
     setup() {
@@ -21,13 +22,8 @@ export class ShootingScreen extends BaseScene {
         this.backgroundGroup = new THREE.Group();
         this.scene.add(this.backgroundGroup);
 
-        const loader = new THREE.TextureLoader();
-        loader.load('TextureImage/stage1_atlas.png', (texture) => {
-            // Fix texture bleeding
-            texture.magFilter = THREE.NearestFilter;
-            texture.minFilter = THREE.NearestFilter;
-            texture.colorSpace = THREE.SRGBColorSpace;
-
+        const texture = textureManager.getTexture('TextureImage/stage1_atlas.png');
+        if (texture) {
             const meshWidth = 9;
             const meshHeight = 9;
             const geometry = new THREE.PlaneGeometry(meshWidth, meshHeight);
@@ -72,7 +68,7 @@ export class ShootingScreen extends BaseScene {
 
             // Initial Position: Left edge at screen left (-8)
             this.backgroundGroup.position.x = -2.4;
-        });
+        }
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
