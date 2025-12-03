@@ -61,15 +61,22 @@ export class InputManager {
         document.addEventListener('gesturechange', (e) => e.preventDefault());
         document.addEventListener('gestureend', (e) => e.preventDefault());
 
+        // --- Touch Zone (Left 40%) ---
+        const touchZone = document.createElement('div');
+        touchZone.style.position = 'absolute';
+        touchZone.style.top = '0';
+        touchZone.style.left = '0';
+        touchZone.style.width = '40%';
+        touchZone.style.height = '100%';
+        touchZone.style.touchAction = 'none';
+        touchZone.style.pointerEvents = 'auto'; // Enable touch events
+        gamepadContainer.appendChild(touchZone);
+
         // --- Analog Stick (Bottom Left) ---
         const stickContainer = document.createElement('div');
         stickContainer.style.position = 'absolute';
         stickContainer.style.bottom = '4%'; // Relative to container height
         stickContainer.style.left = '3.5%';
-        // stickContainer.style.width = '40%'; // Relative to container width (approx) TODO :  delete line
-        // To keep it circular and relative to height, we can use aspect-ratio or calculate px
-        // But user asked for 25% of screen height.
-        // Since container is 100% height of game-container, 25% height is good.
         stickContainer.style.height = '20%';
         stickContainer.style.width = 'auto'; // Let aspect ratio handle width
         stickContainer.style.aspectRatio = '1/1';
@@ -77,7 +84,7 @@ export class InputManager {
         stickContainer.style.borderRadius = '50%';
         stickContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
         stickContainer.style.border = '2px solid rgba(255, 255, 255, 0.3)';
-        stickContainer.style.pointerEvents = 'auto';
+        stickContainer.style.pointerEvents = 'none';
         stickContainer.style.touchAction = 'none';
         gamepadContainer.appendChild(stickContainer);
 
@@ -95,13 +102,21 @@ export class InputManager {
 
         // Stick Logic
         let stickId = null;
+        let stickCenter = null; // Store the logical center of the stick
         // We need to recalculate maxRadius on interaction in case of resize
 
         const handleStickMove = (clientX, clientY) => {
             const rect = stickContainer.getBoundingClientRect();
             const maxRadius = rect.height / 1;
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
+
+            let centerX, centerY;
+            if (stickCenter) {
+                centerX = stickCenter.x;
+                centerY = stickCenter.y;
+            } else {
+                centerX = rect.left + rect.width / 2;
+                centerY = rect.top + rect.height / 2;
+            }
 
             let dx = clientX - centerX;
             let dy = clientY - centerY;
@@ -132,16 +147,26 @@ export class InputManager {
             this.inputState.up = false;
             this.inputState.down = false;
             stickId = null;
+            stickCenter = null;
         };
 
-        stickContainer.addEventListener('touchstart', (e) => {
+        touchZone.addEventListener('touchstart', (e) => {
             // e.preventDefault(); // Handled by container
             const touch = e.changedTouches[0];
             stickId = touch.identifier;
+
+            // Move Stick to Touch Position
+            const containerRect = gamepadContainer.getBoundingClientRect();
+            const relX = touch.clientX - containerRect.left;
+            const relY = touch.clientY - containerRect.top;
+
+            // Set logical center to the touch point
+            stickCenter = { x: touch.clientX, y: touch.clientY };
+
             handleStickMove(touch.clientX, touch.clientY);
         }, { passive: false });
 
-        stickContainer.addEventListener('touchmove', (e) => {
+        touchZone.addEventListener('touchmove', (e) => {
             // e.preventDefault();
             for (let i = 0; i < e.changedTouches.length; i++) {
                 if (e.changedTouches[i].identifier === stickId) {
@@ -160,8 +185,8 @@ export class InputManager {
                 }
             }
         };
-        stickContainer.addEventListener('touchend', endStick);
-        stickContainer.addEventListener('touchcancel', endStick);
+        touchZone.addEventListener('touchend', endStick);
+        touchZone.addEventListener('touchcancel', endStick);
 
 
         // --- Buttons Container ---
