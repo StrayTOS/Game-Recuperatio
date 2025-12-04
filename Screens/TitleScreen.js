@@ -88,7 +88,7 @@ export class TitleScreen extends BaseScene {
 
         // Version
         const version = document.createElement('div');
-        version.textContent = 'Version 0.2.5';
+        version.textContent = 'Version 0.2.6';
         version.style.marginLeft = '32px';
         version.style.textAlign = 'left';
         version.style.fontSize = '24px';

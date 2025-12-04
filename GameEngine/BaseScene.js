@@ -219,9 +219,9 @@ export class BaseScene {
     }
 
     toggleFullscreenDialog() {
-        // Only for touch devices? User said "This fullscreen feature is only for smartphones."
-        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        if (!isTouchDevice) return;
+        // Initially, this was a feature only for smartphones, but now it has been commented out so that full screen functionality also works on PCs.
+        // const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        // if (!isTouchDevice) return;
 
         this.isFullscreenDialogOpen = !this.isFullscreenDialogOpen;
 

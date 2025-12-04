@@ -98,12 +98,50 @@ export class EpilogueScreen extends BaseScene {
         overlay.style.cursor = 'pointer';
         overlay.style.pointerEvents = 'auto';
         overlay.onclick = () => {
-            if (!this.inputLocked) {
-                audioManager.playSFX('confirm');
-                this.transitionTo('Ending');
-            }
+            if (!this.inputLocked) this.nextScene();
         };
         this.uiContainer.appendChild(overlay);
+
+        // Play Icon (Progress Button)
+        const playIcon = document.createElement('div');
+        playIcon.style.position = 'absolute';
+        playIcon.style.bottom = '64px';
+        playIcon.style.right = '64px';
+        playIcon.style.width = '90px';
+        playIcon.style.height = '90px';
+        playIcon.style.border = '6px solid white';
+        playIcon.style.borderRadius = '50%';
+        playIcon.style.cursor = 'pointer';
+        playIcon.style.pointerEvents = 'auto';
+
+        // Triangle shape
+        const triangle = document.createElement('div');
+        triangle.style.width = '0';
+        triangle.style.height = '0';
+        triangle.style.borderTop = '25px solid transparent';
+        triangle.style.borderBottom = '25px solid transparent';
+        triangle.style.borderLeft = '50px solid white';
+        triangle.style.position = 'absolute';
+        triangle.style.top = '50%';
+        triangle.style.left = '55%';
+        triangle.style.transform = 'translate(-50%, -50%)';
+        playIcon.appendChild(triangle);
+
+        // Blink animation
+        playIcon.animate([
+            { opacity: 1 },
+            { opacity: 0.2 },
+            { opacity: 1 }
+        ], {
+            duration: 5000,
+            iterations: Infinity
+        });
+
+        playIcon.onclick = () => {
+            if (!this.inputLocked) this.nextScene();
+        };
+
+        this.uiContainer.appendChild(playIcon);
     }
 
     update(deltaTime) {
@@ -111,7 +149,7 @@ export class EpilogueScreen extends BaseScene {
         if (this.handleFullscreenInput()) return;
         // Fade in lines sequentially
         this.lineTimer += deltaTime;
-        if (this.lineTimer > 1.0 && this.currentLineIndex < this.textLines.length) {
+        if (this.lineTimer > 0.75 && this.currentLineIndex < this.textLines.length) {
             const line = this.textLines[this.currentLineIndex];
             line.style.opacity = '1';
             setTimeout(() => {
@@ -122,9 +160,11 @@ export class EpilogueScreen extends BaseScene {
         }
 
         const input = this.game.inputManager.getInput();
-        if (input.confirm && !this.inputLocked) {
-            audioManager.playSFX('confirm');
-            this.transitionTo('Ending');
-        }
+        if (input.confirm && !this.inputLocked) this.nextScene();
+    }
+
+    nextScene() {
+        audioManager.playSFX('confirm');
+        this.transitionTo('Ending');
     }
 }
