@@ -1,6 +1,10 @@
 # Recuperatio
 This is a game project being created using Google Antigravity's Gemini 3 Pro (High) Agent.  
   
+[![Game screen video](https://straytos.github.io/Game-Recuperatio/images/screenshot.png)](https://youtu.be/jeG5tUKi5dw)  
+  
+[You can play "Recuperatio" here.](https://straytos.github.io/Game-Recuperatio/)  
+  
   
 LICENSE : "Attribution-NonCommercial-NoDerivatives 4.0 International"   
   
@@ -265,5 +269,4 @@ The initial specifications were as follows. There were some path errors in the i
   *Files that define the appearance, movement, and attack patterns for each enemy type  
  ##Game Engine Folder  
   *Processing files used throughout the game  
-  
   
