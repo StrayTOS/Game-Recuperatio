@@ -1,7 +1,7 @@
 # Recuperatio
 This is a game project being created using Google Antigravity's Gemini 3 Pro (High) Agent.  
   
-[![Game screen video](https://straytos.github.io/Game-Recuperatio/images/screenshot.png)](https://youtu.be/jeG5tUKi5dw)  
+[![Game screen video](https://github.com/StrayTOS/Game-Recuperatio/blob/master/Images/screenshot.png)](https://youtu.be/jeG5tUKi5dw)  
   
 [You can play "Recuperatio" here.](https://straytos.github.io/Game-Recuperatio/)  
   
