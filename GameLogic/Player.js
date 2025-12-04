@@ -131,18 +131,26 @@ export class Player {
         const input = this.inputManager.getInput();
         this.velocity.set(0, 0, 0);
 
-        // If left and right or top and bottom are input at the same time,
-        // the process that is judged later in the left and right and top
-        // and bottom detection process adds it to the current value
-        // and cancels it out, so that it is treated as if it was not input.
-        if (input.left) this.velocity.x = -1;
-        if (input.right) this.velocity.x += 1;
-        if (input.up) this.velocity.y = 1;
-        if (input.down) this.velocity.y += -1;
+        // Analog Movement (Priority)
+        if (input.moveVector && (input.moveVector.x !== 0 || input.moveVector.y !== 0)) {
+            // moveVector is already normalized (max length 1) in InputManager
+            // Multiply by speed
+            this.velocity.set(input.moveVector.x, input.moveVector.y, 0).multiplyScalar(this.speed);
+        } else {
+            // Digital Movement (Fallback)
+            // If left and right or top and bottom are input at the same time,
+            // the process that is judged later in the left and right and top
+            // and bottom detection process adds it to the current value
+            // and cancels it out, so that it is treated as if it was not input.
+            if (input.left) this.velocity.x = -1;
+            if (input.right) this.velocity.x += 1;
+            if (input.up) this.velocity.y = 1;
+            if (input.down) this.velocity.y += -1;
 
-        // Normalize if moving diagonally
-        if (this.velocity.lengthSq() > 0) {
-            this.velocity.normalize().multiplyScalar(this.speed);
+            // Normalize if moving diagonally
+            if (this.velocity.lengthSq() > 0) {
+                this.velocity.normalize().multiplyScalar(this.speed);
+            }
         }
 
         // Floating Sway (Sine wave on Y)

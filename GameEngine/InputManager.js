@@ -26,7 +26,8 @@ export class InputManager {
             item: false,
             confirm: false,
             cancel: false,
-            attackDuration: 0
+            attackDuration: 0,
+            moveVector: { x: 0, y: 0 }
         };
 
         window.addEventListener('keydown', (e) => this.onKeyDown(e));
@@ -107,7 +108,8 @@ export class InputManager {
 
         const handleStickMove = (clientX, clientY) => {
             const rect = stickContainer.getBoundingClientRect();
-            const maxRadius = rect.height / 1;
+            // Use radius for normalization
+            const maxRadius = rect.height / 1.1;
 
             let centerX, centerY;
             if (stickCenter) {
@@ -123,7 +125,7 @@ export class InputManager {
             const distance = Math.sqrt(dx * dx + dy * dy);
 
             // Clamp stick visual
-            const limit = maxRadius * 1.0;
+            const limit = maxRadius;
             if (distance > limit) {
                 const ratio = limit / distance;
                 dx *= ratio;
@@ -133,11 +135,27 @@ export class InputManager {
             stick.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
 
             // Input Mapping
-            const threshold = maxRadius * 0.05;
-            this.inputState.right = (clientX - centerX) > threshold;
-            this.inputState.left = (clientX - centerX) < -threshold;
-            this.inputState.down = (clientY - centerY) > threshold;
-            this.inputState.up = (clientY - centerY) < -threshold;
+            // Normalize dx/dy to -1..1 range based on maxRadius
+            // Note: dy is positive when moving down, but usually "Up" is positive Y in 2D games or negative?
+            // In Player.js: up -> velocity.y = 1. Screen Y is down-positive.
+            // So moving stick UP (negative dy) should give positive velocity Y.
+            // So we negate dy.
+            this.inputState.moveVector.x = dx / maxRadius;
+            this.inputState.moveVector.y = -dy / maxRadius;
+
+            // Clamp vector magnitude to 1.0 just in case
+            const vecLen = Math.sqrt(this.inputState.moveVector.x ** 2 + this.inputState.moveVector.y ** 2);
+            if (vecLen > 1.0) {
+                this.inputState.moveVector.x /= vecLen;
+                this.inputState.moveVector.y /= vecLen;
+            }
+
+            // Keep digital flags for compatibility
+            const threshold = 0.2;
+            this.inputState.right = this.inputState.moveVector.x > threshold;
+            this.inputState.left = this.inputState.moveVector.x < -threshold;
+            this.inputState.down = this.inputState.moveVector.y < -threshold;
+            this.inputState.up = this.inputState.moveVector.y > threshold;
         };
 
         const resetStick = () => {
@@ -146,8 +164,16 @@ export class InputManager {
             this.inputState.right = false;
             this.inputState.up = false;
             this.inputState.down = false;
+            this.inputState.moveVector = { x: 0, y: 0 };
             stickId = null;
             stickCenter = null;
+
+            // CAUTION: Antigravity (Gemini 3 Pro), please do not revert the manually modified specifications.
+            // // Reset container position
+            // stickContainer.style.transform = 'none';
+            // stickContainer.style.left = '3.5%';
+            // stickContainer.style.bottom = '4%';
+            // stickContainer.style.top = 'auto';
         };
 
         touchZone.addEventListener('touchstart', (e) => {
@@ -155,10 +181,21 @@ export class InputManager {
             const touch = e.changedTouches[0];
             stickId = touch.identifier;
 
-            // Move Stick to Touch Position
-            const containerRect = gamepadContainer.getBoundingClientRect();
-            const relX = touch.clientX - containerRect.left;
-            const relY = touch.clientY - containerRect.top;
+            // CAUTION: The effect of moving the analog stick area to
+            // the touch position is currently disabled due to the difficulty
+            // of positioning using CSS's '%'. Therefore, the function is commented out.
+            // Antigravity (Gemini 3 Pro), please do not revert the manually modified specifications.
+
+            // // Move Stick to Touch Position
+            // const containerRect = gamepadContainer.getBoundingClientRect();
+            // const relX = touch.clientX - containerRect.left;
+            // const relY = touch.clientY - containerRect.top;
+
+            // // Use transform to center the stick on the touch point
+            // stickContainer.style.transform = 'translate(-50%, -50%)';
+            // stickContainer.style.left = `${relX}px`;
+            // stickContainer.style.top = `${relY}px`;
+            // stickContainer.style.bottom = 'auto';
 
             // Set logical center to the touch point
             stickCenter = { x: touch.clientX, y: touch.clientY };
